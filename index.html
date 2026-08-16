@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noori Finance Society — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#0B1622; --navy-900:#0F1D2E; --navy-800:#14263C; --navy-700:#1C3350; --navy-600:#2A4568;
+    --parchment:#F1E8D6; --ivory:#EDE7D8; --muted:#8FA3BC;
+    --emerald:#3FA173; --amber:#D6A84A; --rust:#C1584A; --line:rgba(241,232,214,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;min-height:100%;}
+  body{
+    background:radial-gradient(ellipse at top left, #101f33 0%, var(--navy-950) 55%), var(--navy-950);
+    color:var(--ivory); font-family:'Inter',sans-serif;
+    min-height:100vh; display:flex; align-items:flex-start; justify-content:center; padding:40px 20px;
+  }
+  .card{
+    width:100%; max-width:400px; background:var(--navy-900); border:1px solid var(--line);
+    border-radius:8px; padding:34px 32px 30px;
+  }
+  .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--amber); margin-bottom:8px; text-align:center;}
+  h1{ font-family:'Fraunces',serif; font-weight:600; font-size:26px; margin:0 0 6px; color:var(--parchment); text-align:center;}
+  .sub{ font-size:12.5px; color:var(--muted); text-align:center; margin-bottom:26px;}
+  .field{ margin-bottom:16px; }
+  label{ display:block; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:7px;}
+  input, select{
+    width:100%; background:var(--navy-800); border:1px solid var(--navy-600); color:var(--ivory);
+    font-family:'Inter',sans-serif; font-size:14px; padding:11px 13px; border-radius:4px;
+  }
+  input:focus, select:focus{outline:none; border-color:var(--amber);}
+  .btn{
+    width:100%; font-family:'Inter',sans-serif; font-weight:600; font-size:14px; color:var(--navy-950);
+    background:var(--parchment); border:none; border-radius:4px; padding:13px; cursor:pointer;
+    margin-top:6px; transition:background .12s ease;
+  }
+  .btn:hover{background:var(--amber);}
+  .btn:disabled{opacity:.6; cursor:default;}
+  #msg{ font-size:12.5px; margin-top:14px; text-align:center; min-height:16px; }
+  #msg.err{color:var(--rust);}
+  #msg.ok{color:var(--emerald);}
+
+  .setup-toggle{
+    text-align:center; margin-top:20px; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--muted);
+    cursor:pointer; text-decoration:underline; text-underline-offset:3px;
+  }
+  .setup-block{ display:none; margin-top:14px; border-top:1px solid var(--line); padding-top:16px;}
+  .setup-block.show{display:block;}
+  .setup-block label{margin-bottom:6px;}
+
+  .dashboard{ display:none; width:100%; max-width:440px; }
+  .dashboard.show{display:block;}
+  .welcome-card{
+    background:var(--parchment); color:var(--navy-950); border-radius:8px; padding:24px 26px; margin-bottom:16px; position:relative;
+  }
+  .role-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    background:var(--navy-950); color:var(--parchment); padding:4px 10px; border-radius:20px; display:inline-block; margin-bottom:12px;
+  }
+  .welcome-card h2{ font-family:'Fraunces',serif; font-size:24px; margin:0 0 6px;}
+  .welcome-card p{ font-size:13px; color:#5A5238; margin:0;}
+
+  .panel{
+    background:var(--navy-900); border:1px solid var(--line); border-radius:8px; padding:20px 22px; margin-bottom:16px;
+  }
+  .panel-title{ font-family:'Fraunces',serif; font-size:17px; color:var(--parchment); margin:0 0 4px;}
+  .panel-note{ font-size:11.5px; color:var(--muted); margin-bottom:16px;}
+
+  .search-row{ display:flex; gap:10px; margin-bottom:6px; }
+  .search-row input{ flex:1; }
+  .search-row button{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13px; color:var(--navy-950);
+    background:var(--parchment); border:none; border-radius:4px; padding:0 18px; cursor:pointer;
+  }
+  .search-row button:hover{background:var(--amber);}
+  .search-row button:disabled{opacity:.6;}
+
+  .profile-block{ display:none; margin-top:16px; }
+  .profile-block.show{display:block;}
+  .profile-header{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
+  .profile-header .name{ font-family:'Fraunces',serif; font-size:18px; color:var(--parchment); }
+  .profile-header .id{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); }
+
+  .result-card{
+    background:var(--navy-800); border:1px solid var(--navy-600); border-radius:6px; padding:16px 18px; margin-bottom:14px;
+  }
+  .result-row{ display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--line); font-size:13.5px;}
+  .result-row:last-child{border-bottom:none;}
+  .result-row .k{ color:var(--muted); }
+  .result-row .v{ font-weight:600; }
+  .eligible-yes{ color:var(--emerald); }
+  .eligible-no{ color:var(--rust); }
+
+  .month-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; margin-bottom:16px; }
+  .month-pill{ text-align:center; padding:8px 4px; border-radius:6px; font-size:11px; }
+  .month-pill .m{ font-family:'IBM Plex Mono',monospace; font-size:9.5px; text-transform:uppercase; opacity:.75; display:block; margin-bottom:3px;}
+  .month-pill.paid{ background:rgba(63,161,115,0.18); color:var(--emerald); }
+  .month-pill.unpaid{ background:rgba(193,88,74,0.15); color:var(--rust); }
+  .month-pill.blank{ background:var(--navy-800); color:var(--muted); }
+
+  .mark-form{ display:none; background:var(--navy-800); border:1px solid var(--navy-600); border-radius:6px; padding:14px 16px; }
+  .mark-form.show{ display:block; }
+  .mark-form .row{ display:flex; gap:10px; margin-bottom:10px; }
+  .mark-form .row > *{ flex:1; }
+  .mark-form .btn-row{ display:flex; gap:10px; }
+  .mark-form .btn-row button{
+    flex:1; font-weight:600; border:none; border-radius:4px; padding:11px; cursor:pointer; color:var(--navy-950);
+  }
+  #markPaidBtn{ background:var(--emerald); }
+  #markUnpaidBtn{ background:var(--rust); }
+
+  .logout{
+    display:block; margin:16px auto 0; background:transparent; border:1px solid var(--navy-600); color:var(--parchment);
+    font-family:'Inter',sans-serif; font-size:12.5px; padding:9px 18px; border-radius:4px; cursor:pointer;
+  }
+  .logout:hover{border-color:var(--amber); color:var(--amber);}
+</style>
+</head>
+<body>
+
+<div class="card" id="loginCard">
+  <div class="eyebrow">Noori Finance Society</div>
+  <h1>Member Login</h1>
+  <div class="sub">Enter your name and PIN to continue</div>
+
+  <div class="field">
+    <label for="nameInput">Name</label>
+    <input type="text" id="nameInput" placeholder="As registered by admin">
+  </div>
+  <div class="field">
+    <label for="pinInput">PIN</label>
+    <input type="password" id="pinInput" placeholder="4-digit PIN" inputmode="numeric" maxlength="6">
+  </div>
+  <button class="btn" id="loginBtn">Log in</button>
+  <div id="msg"></div>
+
+  <div class="setup-toggle" id="setupToggle">Connect app to Google Sheet ▾</div>
+  <div class="setup-block" id="setupBlock">
+    <label for="scriptUrl">Apps Script Web App URL</label>
+    <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <div style="font-size:11px; color:var(--muted); margin-top:8px;">Paste the URL from Step 3 (Deploy → Web app). It's saved in this browser so you won't need to paste it again.</div>
+  </div>
+</div>
+
+<div class="dashboard" id="dashboard">
+  <div class="welcome-card">
+    <div class="role-tag" id="roleTag">Role</div>
+    <h2 id="welcomeName">Welcome</h2>
+    <p id="welcomeSub">Logged in successfully.</p>
+  </div>
+
+  <!-- Admin: search panel -->
+  <div class="panel" id="searchPanel" style="display:none;">
+    <div class="panel-title">Member Profile</div>
+    <div class="panel-note">Enter a Member ID to see everything about them</div>
+    <div class="search-row">
+      <input type="text" id="memberIdInput" placeholder="Member ID (e.g. 3454)">
+      <button id="searchBtn">Search</button>
+    </div>
+    <div id="searchMsg" style="font-size:12px; min-height:14px;"></div>
+
+    <div class="profile-block" id="profileBlock">
+      <div class="profile-header">
+        <span class="name" id="pName"></span>
+        <span class="id" id="pId"></span>
+      </div>
+      <div class="result-card">
+        <div class="result-row"><span class="k">Total Contribution</span><span class="v" id="pTotal"></span></div>
+        <div class="result-row"><span class="k">Loan Eligible</span><span class="v" id="pEligible"></span></div>
+      </div>
+      <div class="month-grid" id="pMonthGrid"></div>
+
+      <div class="mark-form show" id="markForm">
+        <div class="row">
+          <select id="monthSelect">
+            <option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar">Mar</option>
+            <option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option>
+            <option value="Jul">Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option>
+            <option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option>
+          </select>
+          <input type="number" id="payAmount" value="500">
+        </div>
+        <div class="btn-row">
+          <button id="markPaidBtn">Mark Paid</button>
+          <button id="markUnpaidBtn">Mark Unpaid</button>
+        </div>
+        <div id="markMsg" style="font-size:12px; min-height:14px; margin-top:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member: own profile, read-only -->
+  <div class="panel" id="ownPanel" style="display:none;">
+    <div class="panel-title">My Contribution</div>
+    <div class="panel-note">Your current standing with the society</div>
+    <div class="result-card">
+      <div class="result-row"><span class="k">Total Contribution</span><span class="v" id="ownTotal">—</span></div>
+      <div class="result-row"><span class="k">Loan Eligible</span><span class="v" id="ownEligible">—</span></div>
+    </div>
+    <div class="month-grid" id="ownMonthGrid"></div>
+  </div>
+
+  <button class="logout" id="logoutBtn">Log out</button>
+</div>
+
+<script>
+const SCRIPT_URL_KEY = 'noori_script_url';
+const savedUrl = localStorage.getItem(SCRIPT_URL_KEY);
+if (savedUrl) document.getElementById('scriptUrl').value = savedUrl;
+
+document.getElementById('setupToggle').addEventListener('click', () => {
+  document.getElementById('setupBlock').classList.toggle('show');
+});
+
+let currentUser = null;
+let currentProfileId = null; // the member ID currently shown in the admin search result
+
+function callAppsScriptJSONP(scriptUrl, params) {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'jsonp_cb_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+    const script = document.createElement('script');
+    let timeoutId;
+
+    function cleanup() {
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      clearTimeout(timeoutId);
+    }
+
+    window[callbackName] = (data) => { cleanup(); resolve(data); };
+    script.onerror = () => { cleanup(); reject(new Error('Could not reach the script.')); };
+    timeoutId = setTimeout(() => { cleanup(); reject(new Error('Request timed out.')); }, 15000);
+
+    const qs = new URLSearchParams({ ...params, callback: callbackName });
+    script.src = scriptUrl + '?' + qs.toString();
+    document.body.appendChild(script);
+  });
+}
+
+function scriptUrl() { return document.getElementById('scriptUrl').value.trim(); }
+
+function renderMonthGrid(containerId, months) {
+  const el = document.getElementById(containerId);
+  if (!months) { el.innerHTML = ''; return; }
+  el.innerHTML = months.map(m => {
+    const raw = String(m.value).trim();
+    let cls = 'blank', label = '—';
+    if (raw && raw.toLowerCase() !== 'unpaid') { cls = 'paid'; label = '₹' + raw; }
+    else if (raw.toLowerCase() === 'unpaid') { cls = 'unpaid'; label = 'Unpaid'; }
+    return `<div class="month-pill ${cls}"><span class="m">${m.month}</span>${label}</div>`;
+  }).join('');
+}
+
+const CURRENT_MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][new Date().getMonth()];
+document.getElementById('monthSelect').value = CURRENT_MONTH_ABBR;
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const name = document.getElementById('nameInput').value.trim();
+  const pin = document.getElementById('pinInput').value.trim();
+  const su = scriptUrl();
+  const msg = document.getElementById('msg');
+  const btn = document.getElementById('loginBtn');
+
+  if (!su) {
+    msg.textContent = 'First paste your Apps Script Web App URL below (Connect app to Google Sheet).';
+    msg.className = 'err';
+    document.getElementById('setupBlock').classList.add('show');
+    return;
+  }
+  if (!name || !pin) {
+    msg.textContent = 'Enter both name and PIN.';
+    msg.className = 'err';
+    return;
+  }
+
+  localStorage.setItem(SCRIPT_URL_KEY, su);
+  btn.disabled = true;
+  msg.textContent = 'Checking…';
+  msg.className = '';
+
+  try {
+    const data = await callAppsScriptJSONP(su, { action: 'login', name, pin });
+    if (data.ok) {
+      currentUser = { ...data.member, pin };
+      showDashboard(currentUser);
+    } else {
+      msg.textContent = data.error || 'Login failed.';
+      msg.className = 'err';
+    }
+  } catch (err) {
+    console.error(err);
+    msg.textContent = 'Could not reach the sheet. Check the Web App URL and that it is deployed with access "Anyone".';
+    msg.className = 'err';
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+function showDashboard(member) {
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('dashboard').classList.add('show');
+  document.getElementById('roleTag').textContent = member.role;
+  document.getElementById('welcomeName').textContent = 'Welcome, ' + member.name;
+  document.getElementById('welcomeSub').textContent = member.role === 'Admin'
+    ? 'You are logged in as an admin.'
+    : 'You are logged in as a member.';
+
+  if (member.role === 'Admin') {
+    document.getElementById('searchPanel').style.display = 'block';
+  } else {
+    document.getElementById('ownPanel').style.display = 'block';
+    loadOwnProfile();
+  }
+}
+
+document.getElementById('searchBtn').addEventListener('click', async () => {
+  const memberId = document.getElementById('memberIdInput').value.trim();
+  const searchMsg = document.getElementById('searchMsg');
+  const profileBlock = document.getElementById('profileBlock');
+  const btn = document.getElementById('searchBtn');
+
+  if (!memberId) {
+    searchMsg.textContent = 'Enter a Member ID.';
+    searchMsg.style.color = 'var(--rust)';
+    profileBlock.classList.remove('show');
+    return;
+  }
+
+  btn.disabled = true;
+  searchMsg.textContent = 'Searching…';
+  searchMsg.style.color = 'var(--muted)';
+  profileBlock.classList.remove('show');
+
+  try {
+    const data = await callAppsScriptJSONP(scriptUrl(), {
+      action: 'getProfile', callerName: currentUser.name, callerPin: currentUser.pin, memberId
+    });
+
+    if (data.ok) {
+      searchMsg.textContent = '';
+      currentProfileId = data.profile.memberId;
+      document.getElementById('pName').textContent = data.profile.name;
+      document.getElementById('pId').textContent = 'ID: ' + data.profile.memberId;
+
+      const c = data.profile.contribution;
+      if (c) {
+        document.getElementById('pTotal').textContent = '₹' + Number(c.total || 0).toLocaleString('en-IN');
+        const elEl = document.getElementById('pEligible');
+        const isYes = String(c.eligible).trim().toLowerCase() === 'yes';
+        elEl.textContent = c.eligible;
+        elEl.className = 'v ' + (isYes ? 'eligible-yes' : 'eligible-no');
+        renderMonthGrid('pMonthGrid', c.months);
+      } else {
+        document.getElementById('pTotal').textContent = 'No contribution record';
+        document.getElementById('pEligible').textContent = '—';
+        renderMonthGrid('pMonthGrid', null);
+      }
+      profileBlock.classList.add('show');
+    } else {
+      searchMsg.textContent = data.error || 'Member not found.';
+      searchMsg.style.color = 'var(--rust)';
+    }
+  } catch (err) {
+    searchMsg.textContent = 'Network error — try again.';
+    searchMsg.style.color = 'var(--rust)';
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+async function markMonth(paid) {
+  if (!currentProfileId) return;
+  const month = document.getElementById('monthSelect').value;
+  const amount = document.getElementById('payAmount').value || 500;
+  const markMsg = document.getElementById('markMsg');
+
+  document.getElementById('markPaidBtn').disabled = true;
+  document.getElementById('markUnpaidBtn').disabled = true;
+  markMsg.textContent = 'Saving…';
+  markMsg.style.color = 'var(--muted)';
+
+  try {
+    const data = await callAppsScriptJSONP(scriptUrl(), {
+      action: 'markMonth', callerName: currentUser.name, callerPin: currentUser.pin,
+      memberId: currentProfileId, month, paid: paid ? 'yes' : 'no', amount
+    });
+    if (data.ok) {
+      markMsg.textContent = month + (paid ? ' marked Paid.' : ' marked Unpaid.') + ' New total: ₹' + Number(data.newTotal).toLocaleString('en-IN');
+      markMsg.style.color = 'var(--emerald)';
+      document.getElementById('searchBtn').click(); // refresh the profile view
+    } else {
+      markMsg.textContent = data.error || 'Could not update.';
+      markMsg.style.color = 'var(--rust)';
+    }
+  } catch (err) {
+    markMsg.textContent = 'Network error — try again.';
+    markMsg.style.color = 'var(--rust)';
+  } finally {
+    document.getElementById('markPaidBtn').disabled = false;
+    document.getElementById('markUnpaidBtn').disabled = false;
+  }
+}
+
+document.getElementById('markPaidBtn').addEventListener('click', () => markMonth(true));
+document.getElementById('markUnpaidBtn').addEventListener('click', () => markMonth(false));
+
+async function loadOwnProfile() {
+  try {
+    const data = await callAppsScriptJSONP(scriptUrl(), {
+      action: 'getProfile', callerName: currentUser.name, callerPin: currentUser.pin, memberId: currentUser.id
+    });
+    if (data.ok && data.profile.contribution) {
+      const c = data.profile.contribution;
+      document.getElementById('ownTotal').textContent = '₹' + Number(c.total || 0).toLocaleString('en-IN');
+      const el = document.getElementById('ownEligible');
+      const isYes = String(c.eligible).trim().toLowerCase() === 'yes';
+      el.textContent = c.eligible;
+      el.className = 'v ' + (isYes ? 'eligible-yes' : 'eligible-no');
+      renderMonthGrid('ownMonthGrid', c.months);
+    } else {
+      document.getElementById('ownTotal').textContent = 'No contribution record yet';
+    }
+  } catch (err) {
+    document.getElementById('ownTotal').textContent = 'Network error';
+  }
+}
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  currentUser = null;
+  currentProfileId = null;
+  document.getElementById('dashboard').classList.remove('show');
+  document.getElementById('searchPanel').style.display = 'none';
+  document.getElementById('ownPanel').style.display = 'none';
+  document.getElementById('profileBlock').classList.remove('show');
+  document.getElementById('memberIdInput').value = '';
+  document.getElementById('loginCard').style.display = 'block';
+  document.getElementById('nameInput').value = '';
+  document.getElementById('pinInput').value = '';
+  document.getElementById('msg').textContent = '';
+});
+</script>
+</body>
+</html>
