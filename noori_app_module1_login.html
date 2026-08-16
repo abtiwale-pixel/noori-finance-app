@@ -146,10 +146,8 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
   msg.className = '';
 
   try {
-    const res = await fetch(scriptUrl, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'login', name, pin })
-    });
+   const params = new URLSearchParams({ action: 'login', name, pin });
+   const res = await fetch(scriptUrl + '?' + params.toString());
     const data = await res.json();
 
     if (data.ok) {
