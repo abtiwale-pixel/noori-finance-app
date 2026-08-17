@@ -113,6 +113,53 @@
   #markPaidBtn{ background:var(--emerald); }
   #markUnpaidBtn{ background:var(--rust); }
 
+
+  .loan-apply{
+    margin-top:16px; background:var(--navy-800); border:1px solid var(--navy-600);
+    border-radius:6px; padding:16px 18px;
+  }
+  .loan-apply-title{
+    font-family:'Fraunces',serif; font-size:17px; color:var(--parchment); margin-bottom:4px;
+  }
+  .loan-apply-note{font-size:11.5px; color:var(--muted); margin-bottom:14px;}
+  .loan-apply .row{display:flex; gap:10px; margin-bottom:10px;}
+  .loan-apply .row > *{flex:1;}
+  .loan-apply .btn-row{display:flex; gap:10px; margin-top:4px;}
+  #applyLoanBtn{
+    flex:1; font-weight:600; border:none; border-radius:4px; padding:11px;
+    cursor:pointer; color:var(--navy-950); background:var(--amber);
+  }
+  #applyLoanBtn:disabled{opacity:.6; cursor:default;}
+  .loan-readonly{
+    width:100%; background:var(--navy-900); border:1px solid var(--navy-600);
+    color:var(--muted); font-size:13px; padding:10px 12px; border-radius:4px;
+  }
+  #loanApplyMsg{font-size:12px; min-height:14px; margin-top:9px;}
+
+
+  .loan-member-card{
+    background:var(--navy-800); border:1px solid var(--navy-600); border-radius:6px;
+    padding:16px 18px; margin-top:16px;
+  }
+  .loan-member-title{
+    font-family:'Fraunces',serif; font-size:17px; color:var(--parchment); margin-bottom:4px;
+  }
+  .loan-member-note{font-size:11.5px; color:var(--muted); margin-bottom:14px;}
+  .loan-status-running{color:var(--amber);}
+  .loan-status-closed{color:var(--emerald);}
+  .loan-status-pending{color:var(--amber);}
+  .loan-history-item{
+    padding:10px 0; border-bottom:1px solid var(--line); font-size:12.5px;
+  }
+  .loan-history-item:last-child{border-bottom:none;}
+
+  .loan-disabled-option{color:var(--muted);}
+  .loan-history-top{display:flex; justify-content:space-between; margin-bottom:5px;}
+  .loan-history-id{font-family:'IBM Plex Mono',monospace; color:var(--parchment);}
+  .loan-history-status{font-weight:600;}
+  .loan-history-detail{color:var(--muted); line-height:1.55;}
+  .no-loan-message{font-size:12.5px; color:var(--emerald); margin-bottom:14px;}
+
   .logout{
     display:block; margin:16px auto 0; background:transparent; border:1px solid var(--navy-600); color:var(--parchment);
     font-family:'Inter',sans-serif; font-size:12.5px; padding:9px 18px; border-radius:4px; cursor:pointer;
@@ -189,6 +236,38 @@
           <button id="markUnpaidBtn">Mark Unpaid</button>
         </div>
         <div id="markMsg" style="font-size:12px; min-height:14px; margin-top:8px;"></div>
+
+      <div class="loan-apply" id="loanApply">
+        <div class="loan-apply-title">Apply for Loan</div>
+        <div class="loan-apply-note">Create a new loan application for this member</div>
+
+        <div class="row">
+          <div>
+            <label for="loanRequestedAmount">Requested Amount</label>
+            <input type="number" id="loanRequestedAmount" min="1" step="1" placeholder="Enter amount">
+          </div>
+          <div>
+            <label for="loanInstallmentCount">Installments</label>
+            <input type="number" id="loanInstallmentCount" min="1" step="1" placeholder="e.g. 8">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Installment Amount</label>
+            <div class="loan-readonly" id="loanInstallmentAmount">₹0</div>
+          </div>
+          <div>
+            <label>Loan Eligibility</label>
+            <div class="loan-readonly" id="loanEligibilityDisplay">—</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button id="applyLoanBtn">Apply for Loan</button>
+        </div>
+        <div id="loanApplyMsg"></div>
+      </div>
       </div>
     </div>
   </div>
@@ -202,6 +281,81 @@
       <div class="result-row"><span class="k">Loan Eligible</span><span class="v" id="ownEligible">—</span></div>
     </div>
     <div class="month-grid" id="ownMonthGrid"></div>
+
+    <div class="loan-member-card" id="memberLoanCard">
+      <div class="loan-member-title">My Loan</div>
+      <div class="loan-member-note" id="memberLoanNote">Checking your loan status…</div>
+
+      <div id="memberCurrentLoan" style="display:none;">
+        <div class="result-card">
+          <div class="result-row"><span class="k">Loan Amount</span><span class="v" id="memberLoanAmount">—</span></div>
+          <div class="result-row"><span class="k">EMI Amount</span><span class="v" id="memberLoanEmi">—</span></div>
+          <div class="result-row"><span class="k">Total Installments</span><span class="v" id="memberLoanInstallments">—</span></div>
+          <div class="result-row"><span class="k">EMI Paid</span><span class="v" id="memberLoanPaidInstallments">—</span></div>
+          <div class="result-row"><span class="k">EMI Remaining</span><span class="v" id="memberLoanRemainingInstallments">—</span></div>
+          <div class="result-row"><span class="k">Amount Paid</span><span class="v" id="memberLoanPaidAmount">—</span></div>
+          <div class="result-row"><span class="k">Amount Remaining</span><span class="v" id="memberLoanRemainingAmount">—</span></div>
+          <div class="result-row"><span class="k">Loan Status</span><span class="v loan-status-running" id="memberLoanStatus">Running</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--rust);margin-top:10px;">
+          You cannot apply for a new loan while this loan is running.
+        </div>
+      </div>
+
+      <div id="memberLoanApply" style="display:none;">
+        <div class="no-loan-message">You do not have a running loan. You can apply for a new loan.</div>
+
+        <div class="row" style="display:flex;gap:10px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <label for="memberLoanAmountSelect">Loan Amount</label>
+            <select id="memberLoanAmountSelect">
+              <option value="">Select loan amount</option>
+              <option value="5000">₹5,000 — 2 EMI × ₹2,500</option>
+              <option value="10000">₹10,000 — 4 EMI × ₹2,500</option>
+              <option value="20000">₹20,000 — 5 EMI × ₹4,000</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <label>Installments</label>
+            <div class="loan-readonly" id="memberLoanInstallmentCount">—</div>
+          </div>
+        </div>
+
+        <div class="row" style="display:flex;gap:10px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <label>Installment Amount</label>
+            <div class="loan-readonly" id="memberLoanInstallmentAmount">₹0</div>
+          </div>
+          <div style="flex:1;">
+            <label>Loan Eligibility</label>
+            <div class="loan-readonly" id="memberLoanEligibility">—</div>
+          </div>
+        </div>
+
+        <div style="font-size:12px;color:var(--muted);margin:4px 0 10px;">
+          Witness requirement: <strong id="memberWitnessRequirement">—</strong>
+        </div>
+
+        <div class="row" style="display:flex;gap:10px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <label for="memberWitness1">Witness 1 Member ID</label>
+            <input type="text" id="memberWitness1" placeholder="Enter Member ID">
+          </div>
+          <div style="flex:1;">
+            <label for="memberWitness2">Witness 2 Member ID</label>
+            <input type="text" id="memberWitness2" placeholder="Enter Member ID">
+          </div>
+        </div>
+
+        <button id="memberApplyLoanBtn" class="btn">Apply for Loan</button>
+        <div id="memberLoanApplyMsg" style="font-size:12px;min-height:14px;margin-top:9px;"></div>
+      </div>
+
+      <div id="memberLoanHistory" style="display:none;margin-top:16px;">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Loan History</div>
+        <div id="memberLoanHistoryList"></div>
+      </div>
+    </div>
   </div>
 
   <button class="logout" id="logoutBtn">Log out</button>
@@ -353,10 +507,13 @@ document.getElementById('searchBtn').addEventListener('click', async () => {
         const isYes = String(c.eligible).trim().toLowerCase() === 'yes';
         elEl.textContent = c.eligible;
         elEl.className = 'v ' + (isYes ? 'eligible-yes' : 'eligible-no');
+        document.getElementById('loanEligibilityDisplay').textContent = c.eligible || '—';
+        document.getElementById('loanEligibilityDisplay').style.color = isYes ? 'var(--emerald)' : 'var(--rust)';
         renderMonthGrid('pMonthGrid', c.months);
       } else {
         document.getElementById('pTotal').textContent = 'No contribution record';
         document.getElementById('pEligible').textContent = '—';
+        document.getElementById('loanEligibilityDisplay').textContent = '—';
         renderMonthGrid('pMonthGrid', null);
       }
       profileBlock.classList.add('show');
@@ -408,6 +565,327 @@ async function markMonth(paid) {
 document.getElementById('markPaidBtn').addEventListener('click', () => markMonth(true));
 document.getElementById('markUnpaidBtn').addEventListener('click', () => markMonth(false));
 
+
+function updateLoanCalculation() {
+  const amount = Number(document.getElementById('loanRequestedAmount').value || 0);
+  const count = Number(document.getElementById('loanInstallmentCount').value || 0);
+  const emiEl = document.getElementById('loanInstallmentAmount');
+  if (amount > 0 && count > 0) {
+    emiEl.textContent = '₹' + (amount / count).toLocaleString('en-IN', {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+  } else {
+    emiEl.textContent = '₹0';
+  }
+}
+
+document.getElementById('loanRequestedAmount').addEventListener('input', updateLoanCalculation);
+document.getElementById('loanInstallmentCount').addEventListener('input', updateLoanCalculation);
+
+document.getElementById('applyLoanBtn').addEventListener('click', async () => {
+  if (!currentProfileId) return;
+
+  const amount = Number(document.getElementById('loanRequestedAmount').value || 0);
+  const count = Number(document.getElementById('loanInstallmentCount').value || 0);
+  const msg = document.getElementById('loanApplyMsg');
+  const btn = document.getElementById('applyLoanBtn');
+
+  const eligibilityText = document.getElementById('loanEligibilityDisplay').textContent.trim().toLowerCase();
+  const eligible = eligibilityText === 'yes';
+
+  if (!eligible) {
+    msg.textContent = 'This member is not currently eligible for a loan.';
+    msg.style.color = 'var(--rust)';
+    return;
+  }
+  if (amount <= 0) {
+    msg.textContent = 'Enter a valid requested amount.';
+    msg.style.color = 'var(--rust)';
+    return;
+  }
+  if (count <= 0) {
+    msg.textContent = 'Enter the number of installments.';
+    msg.style.color = 'var(--rust)';
+    return;
+  }
+
+  btn.disabled = true;
+  msg.textContent = 'Submitting application…';
+  msg.style.color = 'var(--muted)';
+
+  try {
+    const data = await callAppsScriptJSONP(scriptUrl(), {
+      action: 'applyLoan',
+      callerName: currentUser.name,
+      callerPin: currentUser.pin,
+      memberId: currentProfileId,
+      requestedAmount: amount,
+      installmentCount: count
+    });
+
+    if (data.ok) {
+      msg.textContent = 'Loan application ' + data.applicationId + ' submitted successfully.';
+      msg.style.color = 'var(--emerald)';
+      document.getElementById('loanRequestedAmount').value = '';
+      document.getElementById('loanInstallmentCount').value = '';
+      document.getElementById('loanInstallmentAmount').textContent = '₹0';
+    } else {
+      msg.textContent = data.error || 'Could not submit loan application.';
+      msg.style.color = 'var(--rust)';
+    }
+  } catch (err) {
+    msg.textContent = 'Network error — try again.';
+    msg.style.color = 'var(--rust)';
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+
+function money(value) {
+  return '₹' + Number(value || 0).toLocaleString('en-IN', {
+    maximumFractionDigits: 2
+  });
+}
+
+const LOAN_OPTIONS = {
+  "5000":  { installments: 2, emi: 2500 },
+  "10000": { installments: 4, emi: 2500 },
+  "20000": { installments: 5, emi: 4000 }
+};
+
+function updateMemberLoanCalculation() {
+  const amount = document.getElementById('memberLoanAmountSelect').value;
+  const option = LOAN_OPTIONS[amount];
+  document.getElementById('memberLoanInstallmentCount').textContent =
+    option ? option.installments : '—';
+  document.getElementById('memberLoanInstallmentAmount').textContent =
+    option ? money(option.emi) : '₹0';
+}
+
+document.getElementById('memberLoanAmountSelect').addEventListener('change', updateMemberLoanCalculation);
+
+function getFrontendLoanRule(joinYear, amount) {
+  if (joinYear === 2025) {
+    if (amount === 5000) return { allowed: true, witnesses: 0 };
+    if (amount === 10000) return { allowed: true, witnesses: 1 };
+    if (amount === 20000) return { allowed: true, witnesses: 2 };
+  }
+  if (joinYear === 2026) {
+    if (amount === 5000) return { allowed: true, witnesses: 1 };
+    if (amount === 10000) return { allowed: true, witnesses: 2 };
+    if (amount === 20000) return { allowed: false, witnesses: 0 };
+  }
+  return { allowed: false, witnesses: 0 };
+}
+
+let currentMemberJoinYear = 0;
+
+function configureMemberLoanRules(joinYear) {
+  currentMemberJoinYear = joinYear;
+
+  const select = document.getElementById('memberLoanAmountSelect');
+  const option20 = select.querySelector('option[value="20000"]');
+  const req = document.getElementById('memberWitnessRequirement');
+  const w1 = document.getElementById('memberWitness1').closest('div');
+  const w2 = document.getElementById('memberWitness2').closest('div');
+
+  if (joinYear === 2026) {
+    option20.disabled = true;
+    option20.textContent = '₹20,000 — Not available for 2026 members';
+  } else {
+    option20.disabled = false;
+    option20.textContent = '₹20,000 — 5 EMI × ₹4,000';
+  }
+
+  function updateWitnessFields() {
+    const amount = Number(select.value || 0);
+    const rule = getFrontendLoanRule(currentMemberJoinYear, amount);
+
+    req.textContent = amount ? (rule.allowed ? rule.witnesses + (rule.witnesses === 1 ? ' witness' : ' witnesses') : 'Not allowed') : '—';
+
+    w1.style.display = rule.witnesses >= 1 ? 'block' : 'none';
+    w2.style.display = rule.witnesses >= 2 ? 'block' : 'none';
+
+    if (rule.witnesses === 0) {
+      document.getElementById('memberWitness1').value = '';
+      document.getElementById('memberWitness2').value = '';
+    } else if (rule.witnesses === 1) {
+      document.getElementById('memberWitness2').value = '';
+    }
+  }
+
+  if (select.dataset.rulesBound !== 'yes') {
+    select.addEventListener('change', updateWitnessFields);
+    select.dataset.rulesBound = 'yes';
+  }
+
+  updateWitnessFields();
+  updateMemberLoanCalculation();
+}
+
+async function loadMemberLoans() {
+  const note = document.getElementById('memberLoanNote');
+  const current = document.getElementById('memberCurrentLoan');
+  const apply = document.getElementById('memberLoanApply');
+  const history = document.getElementById('memberLoanHistory');
+  const historyList = document.getElementById('memberLoanHistoryList');
+
+  note.textContent = 'Checking your loan status…';
+  current.style.display = 'none';
+  apply.style.display = 'none';
+  history.style.display = 'none';
+  historyList.innerHTML = '';
+
+  try {
+    const data = await callAppsScriptJSONP(scriptUrl(), {
+      action: 'getLoans',
+      callerName: currentUser.name,
+      callerPin: currentUser.pin,
+      memberId: currentUser.id
+    });
+
+    if (!data.ok) {
+      note.textContent = data.error || 'Could not load loan information.';
+      note.style.color = 'var(--rust)';
+      return;
+    }
+
+    const loans = data.loans || [];
+    const running = data.runningLoan;
+
+    if (running) {
+      note.textContent = 'You currently have a running loan.';
+      note.style.color = 'var(--amber)';
+
+      document.getElementById('memberLoanAmount').textContent = money(running.requestedAmount);
+      document.getElementById('memberLoanEmi').textContent = money(running.installmentAmount);
+      document.getElementById('memberLoanInstallments').textContent = running.installmentCount;
+      document.getElementById('memberLoanPaidInstallments').textContent = running.paidInstallments;
+      document.getElementById('memberLoanRemainingInstallments').textContent = running.remainingInstallments;
+      document.getElementById('memberLoanPaidAmount').textContent = money(running.amountRepaid);
+      document.getElementById('memberLoanRemainingAmount').textContent = money(running.remainingPayable);
+      document.getElementById('memberLoanStatus').textContent = running.status;
+
+      current.style.display = 'block';
+    } else {
+      note.textContent = 'No running loan found.';
+      note.style.color = 'var(--emerald)';
+
+      const eligible = String(data.eligible || '').trim();
+      document.getElementById('memberLoanEligibility').textContent = eligible || '—';
+      document.getElementById('memberLoanEligibility').style.color =
+        eligible.toLowerCase() === 'yes' ? 'var(--emerald)' : 'var(--rust)';
+
+      configureMemberLoanRules(Number(data.joinYear || 0));
+
+      if (eligible.toLowerCase() === 'yes') {
+        apply.style.display = 'block';
+      } else {
+        note.textContent = 'You do not have a running loan, but you are not currently eligible for a new loan.';
+        note.style.color = 'var(--rust)';
+      }
+    }
+
+    if (loans.length) {
+      historyList.innerHTML = loans.map(function(loan) {
+        const statusClass =
+          String(loan.status).toLowerCase() === 'closed' ? 'loan-status-closed' :
+          String(loan.status).toLowerCase() === 'pending' ? 'loan-status-pending' :
+          'loan-status-running';
+
+        return `<div class="loan-history-item">
+          <div class="loan-history-top">
+            <span class="loan-history-id">${loan.applicationId}</span>
+            <span class="loan-history-status ${statusClass}">${loan.status}</span>
+          </div>
+          <div class="loan-history-detail">
+            Loan: ${money(loan.requestedAmount)} · EMI: ${money(loan.installmentAmount)} ·
+            Paid: ${loan.paidInstallments}/${loan.installmentCount} ·
+            Remaining: ${money(loan.remainingPayable)}
+          </div>
+        </div>`;
+      }).join('');
+      history.style.display = 'block';
+    }
+  } catch (err) {
+    note.textContent = 'Network error — try again.';
+    note.style.color = 'var(--rust)';
+  }
+}
+
+document.getElementById('memberApplyLoanBtn').addEventListener('click', async () => {
+  const amount = document.getElementById('memberLoanAmountSelect').value;
+  const option = LOAN_OPTIONS[amount];
+  const witness1 = document.getElementById('memberWitness1').value.trim();
+  const witness2 = document.getElementById('memberWitness2').value.trim();
+  const rule = getFrontendLoanRule(currentMemberJoinYear, Number(amount));
+  const msg = document.getElementById('memberLoanApplyMsg');
+  const btn = document.getElementById('memberApplyLoanBtn');
+
+  if (!option || !rule.allowed) {
+    msg.textContent = (Number(amount) === 20000 && currentMemberJoinYear === 2026)
+      ? '₹20,000 loan is not available for members who joined in 2026.'
+      : 'Select an available loan amount.';
+    msg.style.color = 'var(--rust)';
+    return;
+  }
+
+  if (rule.witnesses >= 1 && !witness1) {
+    msg.textContent = rule.witnesses === 1 ? 'One witness is mandatory.' : 'Two witnesses are mandatory.';
+    msg.style.color = 'var(--rust)';
+    return;
+  }
+
+  if (rule.witnesses >= 2 && !witness2) {
+    msg.textContent = 'Two witnesses are mandatory.';
+    msg.style.color = 'var(--rust)';
+    return;
+  }
+
+  if (rule.witnesses >= 2 && witness1 === witness2) {
+    msg.textContent = 'Witness 1 and Witness 2 must be different members.';
+    msg.style.color = 'var(--rust)';
+    return;
+  }
+
+  btn.disabled = true;
+  msg.textContent = 'Submitting application…';
+  msg.style.color = 'var(--muted)';
+
+  try {
+    const data = await callAppsScriptJSONP(scriptUrl(), {
+      action: 'applyLoan',
+      callerName: currentUser.name,
+      callerPin: currentUser.pin,
+      memberId: currentUser.id,
+      requestedAmount: amount,
+      installmentCount: option.installments,
+      installmentAmount: option.emi,
+      witness1: witness1,
+      witness2: witness2
+    });
+
+    if (data.ok) {
+      msg.textContent = 'Application ' + data.applicationId + ' submitted successfully. Status: Pending.';
+      msg.style.color = 'var(--emerald)';
+      document.getElementById('memberLoanAmountSelect').value = '';
+      document.getElementById('memberWitness1').value = '';
+      document.getElementById('memberWitness2').value = '';
+      updateMemberLoanCalculation();
+      await loadMemberLoans();
+    } else {
+      msg.textContent = data.error || 'Could not submit loan application.';
+      msg.style.color = 'var(--rust)';
+    }
+  } catch (err) {
+    msg.textContent = 'Network error — try again.';
+    msg.style.color = 'var(--rust)';
+  } finally {
+    btn.disabled = false;
+  }
+});
+
 async function loadOwnProfile() {
   try {
     const data = await callAppsScriptJSONP(scriptUrl(), {
@@ -421,8 +899,10 @@ async function loadOwnProfile() {
       el.textContent = c.eligible;
       el.className = 'v ' + (isYes ? 'eligible-yes' : 'eligible-no');
       renderMonthGrid('ownMonthGrid', c.months);
+      await loadMemberLoans();
     } else {
       document.getElementById('ownTotal').textContent = 'No contribution record yet';
+      await loadMemberLoans();
     }
   } catch (err) {
     document.getElementById('ownTotal').textContent = 'Network error';
@@ -440,6 +920,22 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   document.getElementById('loginCard').style.display = 'block';
   document.getElementById('nameInput').value = '';
   document.getElementById('pinInput').value = '';
+  document.getElementById('loanRequestedAmount').value = '';
+  document.getElementById('loanInstallmentCount').value = '';
+  document.getElementById('loanInstallmentAmount').textContent = '₹0';
+  document.getElementById('loanEligibilityDisplay').textContent = '—';
+  document.getElementById('loanApplyMsg').textContent = '';
+  document.getElementById('memberLoanApplyMsg').textContent = '';
+  document.getElementById('memberLoanAmountSelect').value = '';
+  document.getElementById('memberWitness1').value = '';
+  document.getElementById('memberWitness2').value = '';
+  document.getElementById('memberWitnessRequirement').textContent = '—';
+  document.getElementById('memberLoanAmountSelect').querySelector('option[value="20000"]').disabled = false;
+  document.getElementById('memberLoanAmountSelect').querySelector('option[value="20000"]').textContent = '₹20,000 — 5 EMI × ₹4,000';
+  updateMemberLoanCalculation();
+  document.getElementById('memberCurrentLoan').style.display = 'none';
+  document.getElementById('memberLoanApply').style.display = 'none';
+  document.getElementById('memberLoanHistory').style.display = 'none';
   document.getElementById('msg').textContent = '';
 });
 </script>
